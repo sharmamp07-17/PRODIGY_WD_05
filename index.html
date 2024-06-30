@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Lobster&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet" href="weather.css">
+  <title>Weather Application</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="box">
+
+      <div class="header">
+        <h1>Weather App</h1>
+      </div>
+
+      <div class="search">
+        <input type="text" placeholder="Search city">
+      </div>
+
+      <div class="weather-detail">
+
+        <div class="city-name">
+          <h3 id="name">Saila Khurd</h3>
+          <span class="material-symbols-outlined">
+            more_horiz
+          </span>
+        </div>
+
+        <div class="temp-detail">
+          <div class="deg">
+            <p id="curr-deg">16°C</p>
+            <span id="cloud">Broken</span>
+          </div>
+          <div class="min-max">
+            <span id="min-temp">min: 22°C</span>
+            <span id="max-temp">max: 46°C</span>
+          </div>
+        </div>
+
+        <div class="temp-pics">
+          <span id="Icons" class="material-symbols-outlined">wb_sunny
+          </span>
+        </div>
+
+        <div class="other-detail">
+          <div class="feel">
+            <i id="i-icon" class="material-symbols-outlined">air</i>
+            <span id="wind">6km/h</span>
+            <p>Wind</p>
+          </div>
+          <div class="hum">
+            <i id="i-icon" class="material-symbols-outlined">water_drop</i>
+            <span id="hummii">72%</span>
+            <p>Humidity</p>
+          </div>
+          <div class="visi">
+            <i id="i-icon" class="material-symbols-outlined">visibility</i>
+            <span id="visibility">42%</span>
+            <p>visibility</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</body>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+
+  const cityName = document.getElementById('name');
+  const cityTemp = document.getElementById('curr-deg');
+  const minTemp = document.getElementById('min-temp');
+  const maxTemp = document.getElementById('max-temp');
+  const cityCloud = document.getElementById('cloud');
+  const cloudIcons = document.getElementById('Icons');
+  const windSpeed = document.getElementById('wind');
+  const cityVisibility = document.getElementById('visibility');
+  const cityHumidity = document.getElementById('hummii');
+  const inputValue = document.querySelector("input");
+
+  const apiurl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q="
+  const apikey = "80a0c887b74fc1f095faeda9f5028615"
+
+  async function showWeather(city) {
+    const response = await fetch(apiurl + city + `&appid=${apikey}`)
+    try {
+      if (!response.ok) {
+        throw new error("Unable to Fetch Data")
+      }
+
+      const allData = await response.json();
+      console.log(allData);
+      console.log(allData.wind.speed);
+      updateWeather(allData)
+    } catch (error) {
+      swal(`"${city}" not found`, "Please check your City name!", "error");
+      inputValue.value = '';
+    }
+  }
+
+  function updateWeather(data) {
+    cityName.textContent = data.name;
+    cityTemp.textContent = Math.floor(`${data.main.temp}`) + '°C';
+    cityCloud.textContent = data.weather[0].main;
+    minTemp.textContent = 'Min :' + Math.floor(`${data.main.temp_min}`) + '°C';
+    maxTemp.textContent = 'Max :' + Math.floor(`${data.main.temp_max}`) + '°C';
+    const getIcons = weatherIcon(data.weather[0].main);
+    cloudIcons.textContent = getIcons;
+
+    windSpeed.textContent = data.wind.speed + 'km/h';
+    cityHumidity.textContent = (data.main.humidity) + '%';
+    const visiPerc = data.visibility;
+    cityVisibility.textContent = (visiPerc / 100) + '%';
+  }
+
+  inputValue.addEventListener("keypress", (e) => {
+    if (e.key === 'Enter') {
+      const city = inputValue.value;
+      if (city !== '') {
+        showWeather(city);
+        inputValue.value = city
+      }
+      e.target.blur();
+    }
+  })
+
+
+  function weatherIcon(weatherClouds) {
+    const iconsMapArra = {
+      Clear: "wb_sunny",
+      Clouds: "wb_cloudy",
+      Rain: "rainy",
+      Thunderstorm: "thunderstorm",
+      Snow: "weather_snowy",
+      Drizzle: "grain",
+      Mist: "cloud",
+      Smoke: "cloud",
+      Haze: "cloud",
+      Fog: "cloud",
+    };
+    return iconsMapArra[weatherClouds] || "Help"
+  }
+
+  window.onload = () => {
+    showWeather('Saila Khurd');
+  }
+
+</script>
+
+</html>
